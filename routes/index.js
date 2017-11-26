@@ -7,7 +7,8 @@ const
 	express = require('express'),
 	articles = require('./articles'),
 	classes = require('./classes'),
-	api = require('./api'),
+	login = require('./login'),
+	uploadImage = require('./uploadImage')
 	
 	resourceRouter = express.Router(),
 	apiRouter = express.Router()
@@ -17,60 +18,67 @@ const
 // url                      type        description                       require Login
 
 // /resource/articles        get         get all article                  false
-// /resource/articles        put         create new article               true
+// /resource/articles        post        create new article               true
 // /resource/articles/13     get         get one article by id            false
-// /resource/articles/13     post        update one article by id         true
+// /resource/articles/13     put         update one article by id         true
 // /resource/articles/13     delete      delete one article by id         true
 
 // /resource/classes         get         get all classes                  false
-// /resource/classes         put         create new class                 true
-// /resource/classes/13      post        update class by id               true
+// /resource/classes         post        create new class                 true
+// /resource/classes/13      put         update class by id               true
 // /resource/classes/13      delete      delete class by id               true
 
-// /login                    post        login
+// /api/login                post        login
+// /api/login                get         judge islogin
+
+// /api/uploadImage          post         add img                         true
+// /api/uploadImage          delete       delete img                      true
 
 resourceRouter.use((req, res, next) => {
 	let method = req.method,
 		user = req.session.user
-
 	// verify permissions
-	if (process.env.NODE_ENV === 'production') {
+	// if (process.env.NODE_ENV === 'production') {
 		if (method == 'POST' || method == 'PUT' || method == 'DELETE') {
 			if (!user) {
-				res.end(JSON.stringify({
-					code: 40001,
-					msg: 'limited authority'
-				}), 'utf8')
+				// res.end(JSON.stringify({
+				// 	code: 1,
+				// 	msg: 'limited authority'
+				// }), 'utf8')
 
-				return
+				return res.status(401).send('无权限')
 			}
 		}
-	}
+	// }
 
 	next()
 })
 
 // /resource/articles
 resourceRouter.get('/articles', articles.get)
-resourceRouter.put('/articles', articles.put)
+resourceRouter.post('/articles', articles.post)
 
 // /resource/articles/:id
 resourceRouter.get('/articles/:id', articles.getOne)
-resourceRouter.post('/articles/:id', articles.post)
+resourceRouter.put('/articles/:id', articles.put)
 resourceRouter.delete('/articles/:id', articles.delete)
 
 // /resource/classes
 resourceRouter.get('/classes', classes.get)
-resourceRouter.put('/classes', classes.put)
+resourceRouter.post('/classes', classes.post)
 
 // /resource/classes/:id
-resourceRouter.post('/classes/:id', classes.post)
+resourceRouter.put('/classes/:id', classes.put)
 
 
 
 // /api/login
-apiRouter.post('/login', api.login)
+apiRouter.post('/login', login.login)
+apiRouter.get('/login', login.islogin)
 
+// /api/uploadImage
+apiRouter.post('/uploadImage',uploadImage.post)
+apiRouter.delete('/uploadImage',uploadImage.delete)
 
 
 module.exports = {

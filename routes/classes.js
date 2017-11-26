@@ -10,7 +10,7 @@ let classes = {}
 
 // get all classes
 classes.get = (req, res) => {
-	res.end(JSON.stringify({
+	res.send(JSON.stringify({
 		code: 0,
 		classes: Cache.find('classes')
 	}))
@@ -19,7 +19,7 @@ classes.get = (req, res) => {
 
 
 // update one classes by id
-classes.post = (req, res) => {
+classes.put = (req, res) => {
 	let id = Number(req.params.id),
 		set = req.body
 
@@ -29,7 +29,7 @@ classes.post = (req, res) => {
 			{ returnOriginal: false },
 			( err, result ) => {
 				if (err) {
-					res.end(JSON.stringify({
+					res.send(JSON.stringify({
 						code: -1,
 						err: err
 					}))
@@ -38,7 +38,7 @@ classes.post = (req, res) => {
 				if (result.lastErrorObject.n) {
 					Cache.reload()
 
-					res.end(JSON.stringify({
+					res.send(JSON.stringify({
 						code: 0,
 						result: result.value
 					}))
@@ -50,7 +50,7 @@ classes.post = (req, res) => {
 
 
 // create new classes
-classes.put = (req, res) => {
+classes.post = (req, res) => {
 	let data = {
 		name: req.body.name,
 		articles: []
@@ -63,13 +63,13 @@ classes.put = (req, res) => {
 		if (ok) {
 			Cache.reload()
 
-			res.end(JSON.stringify({
+			res.send(JSON.stringify({
 				code: 0,
 				result: data
 			}))
 		}
 	}).then(err => {
-		res.end(JSON.stringify({
+		res.send(JSON.stringify({
 			code: -1,
 			err: err,
 			errorMsg: 'insertOne error'

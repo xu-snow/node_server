@@ -2,11 +2,11 @@ const
 	fs = require('fs'),
 	path = require('path')
 	marked = require('marked'),
-	moment = require('moment'),
 	co = require('co')
-
+	moment = require('moment'),
 	Cache = require('../module/cache')(),
-	db = require('../module/db')
+	db = require('../module/db');
+
 
 
 
@@ -21,8 +21,7 @@ const saveImg = imgObj => {
 				path.resolve(__dirname, '../public/upload/articles/', imgObj.name),
 				new Buffer(imgObj.ctn.replace(/^data:image\/\w+;base64,/, ''), 'base64'),
 				err => {
-					console.log(err)
-					if (err) {reject({type: 'saveImg error', err:err})}
+					if (err) {reject({type: 'saveImg error', err:err, code:1})}
 					else {resolve()}
 				}
 			)
@@ -46,7 +45,7 @@ articles.get = (req, res) => {
 		})
 	}
 
-	res.end(JSON.stringify({
+	res.send(JSON.stringify({
 		code: 0,
 		articles: temp
 	}))
@@ -58,7 +57,7 @@ articles.get = (req, res) => {
 articles.getOne = (req, res) => {
 	let id = req.params.id
 
-	res.end(JSON.stringify({
+	res.send(JSON.stringify({
 		code: 0,
 		article: Cache.findOne('articles', id) || null
 	}))
@@ -67,7 +66,7 @@ articles.getOne = (req, res) => {
 
 
 // upload one article by id
-articles.post = (req, res) => {
+articles.put = (req, res) => {
 	let id = Number(req.params.id),
 		data = JSON.parse(req.body.data),
 		task = [],
@@ -81,6 +80,9 @@ articles.post = (req, res) => {
 
 	data.article.html = marked(data.article.markdown)
 	data.article.bg.ctn = '/upload/articles/' + data.article.bg.name
+
+	// 修改最后编辑时间
+	data.article.last_time = moment().format('YYYY-MM-DD HH:mm')
 
 	task.push(db.update('articles', {id: id}, {$set: data.article}))
 
@@ -99,19 +101,19 @@ articles.post = (req, res) => {
 		if (results[0].result.n) {
 			Cache.reload()
 
-			res.end(JSON.stringify({
+			res.send(JSON.stringify({
 				code: 0
 			}))
 		}
 	}).catch(err => {
-		res.end(JSON.stringify(err))
+		res.send(JSON.stringify(err))
 	})
 }
 
 
 
 // create new article
-articles.put = (req, res) => {
+articles.post = (req, res) => {
 	let data = JSON.parse(req.body.data)
 
 	// save background image
@@ -120,7 +122,7 @@ articles.put = (req, res) => {
 		// pre-process for insert article
 		data.bg.ctn = '/upload/articles/' + data.bg.name
 		data.html = marked(data.markdown)
-		data.date = moment(Number(data.timestamp)).format('YYYY-MM-DD HH:hh')
+		data.date = moment(Number(data.timestamp)).format('YYYY-MM-DD HH:mm')
 
 		// insert article
 		return db.insert('articles', data)
@@ -138,15 +140,13 @@ articles.put = (req, res) => {
 
 		Cache.reload()
 
-		res.end(JSON.stringify({
+		res.send(JSON.stringify({
 			code: 0,
 			result: data
 		}))
 
-		console.log(333)
-
 	}).catch(err => {
-		res.end(JSON.stringify(err))
+		res.send(JSON.stringify(err))
 	})
 }
 
@@ -162,9 +162,9 @@ articles.delete = (req, res) => {
 
 		Cache.reload()
 
-		res.end(JSON.stringify({code: 0}))
+		res.send(JSON.stringify({code: 0}))
 	}).catch(err => {
-		res.end(JSON.stringify(err))
+		res.send(JSON.stringify(err))
 	})
 }
 

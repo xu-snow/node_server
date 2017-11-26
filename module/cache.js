@@ -21,7 +21,7 @@ class Cache {
 
 	log () {
 		let _self = this
-		console.log(_self['store'])
+		// console.log(_self['store'])
 	}
 
 	init () {
@@ -37,7 +37,7 @@ class Cache {
 
 		co(function *(){
 			let { articles, classes } = yield temp
-
+			// console.log(articles)
 			classes = _self.toObject(classes)
 			
 			// To convert the references to instances

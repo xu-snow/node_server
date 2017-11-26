@@ -1,7 +1,9 @@
 ＃Desktop Services Store by Mac OS X
 .DS_Store
 
-public/dist/
+public/static
+public/upload
+public/index.html
 
 # Logs
 logs
