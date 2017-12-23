@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 //     }
 // }))
 
+
 app.use(cookieSession({
     name: 'session',
     secret: 'LinDong secret',
@@ -59,12 +60,15 @@ if (!NODE_ENV) {
         res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
         res.header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With')
         res.header('Access-Control-Allow-Credentials', "true")
-        res.header("Content-Type", "application/json;charset=utf-8");
         // if(req.method=="OPTIONS") res.send(200);/*让options请求快速返回*/
         next()
 
     })
 }
+app.all('*', function(req, res, next) {
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next()
+})
 
 
 
