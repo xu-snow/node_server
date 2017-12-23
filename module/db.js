@@ -15,13 +15,13 @@ catch (e) {
 
 
 
-db.find = ( collectionName, query = {} , operate = []) => {
+db.find = ( collectionName, query = {} , projection = []) => {
 	return new Promise((resolve, reject) => {
 		let cursor = DB.collection(collectionName).find(query)
 
 		// packaging native mongoDB operate such as Sort
-		if (operate.length) {
-			operate.forEach(e => {
+		if (projection.length) {
+			projection.forEach(e => {
 				cursor = cursor[e.key](e.value)
 			})
 		}

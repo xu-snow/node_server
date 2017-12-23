@@ -32,23 +32,55 @@ const saveImg = imgObj => {
 
 // get all articles
 articles.get = (req, res) => {
-	let cache = Cache.find('articles'),
-		filter = req.query.filter || 'all',
-		temp = []
+	let 
+	//  cache = Cache.find('articles'),
+		classes = Cache.find('classes'),
+		filter = req.query.filter,
+		limit = req.query.limit || 10,
+		offset = req.query.offset || 0,
+		articleIds = [],
+		_filter = {};
+	const projection = [{key: 'sort', value: {id: -1}},{key:'limit',value:limit},{key:'skip',value:offset}];
 
-	if (filter == 'all') {
-		temp = cache
-	}
-	else {
-		cache.forEach((element, index) => {
-			element.classes.name == filter && temp.push(element)
+	if(filter){
+		classes.every(item=>{
+			if(item.name === filter ){
+				articleIds = item.articles
+				return false
+			}
+			return true
 		})
+		_filter = {id: {$in: articleIds}}
 	}
+	db.find('articles', _filter, projection).then(data=>{
+		if(Array.isArray(data)){
+			res.send(JSON.stringify({
+				code: 0,
+				articles: data.map(item=>{
+					let classId = item.classes;
+					item.classes = Cache.findOne('classes', classId)
+					return item
+				})
+			}))
+		}else{
+			res.send(JSON.stringify({
+				code: 0,
+				type: 'error',
+				msg: '查询失败'
+			}))
+		}
+	
+	})
 
-	res.send(JSON.stringify({
-		code: 0,
-		articles: temp
-	}))
+	// if (filter == 'all') {
+	// 	temp = cache
+	// }
+	// else {
+	// 	cache.forEach((element, index) => {
+	// 		element.classes.name == filter && temp.push(element)
+	// 	})
+	// }
+
 }
 
 

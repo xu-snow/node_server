@@ -33,24 +33,23 @@ class Cache {
 			temp = {}
 
 		temp.classes = db.find('classes')
-		temp.articles = db.find('articles', {}, [{key: 'sort', value: {id: -1}}])
+		// temp.articles = db.find('articles', {}, [{key: 'sort', value: {id: -1}}])
 
 		co(function *(){
-			let { articles, classes } = yield temp
+			let { classes } = yield temp
 			// console.log(articles)
 			classes = _self.toObject(classes)
 			
 			// To convert the references to instances
-			articles = _self.toObject(_self.convert(articles, 'classes', classes))
+			// articles = _self.toObject(_self.convert(articles, 'classes', classes))
 
 			_self.save('classes', classes)
-			_self.save('articles', articles)
+			// _self.save('articles', articles)
 		})
 	}
 
 	save (name, data) {
 		this['store'][name] = data
-
 	} 
 
 	toObject (array, name='id') {
