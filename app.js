@@ -17,7 +17,7 @@ var
 
 const
     NODE_ENV = process.env.NODE_ENV === 'production',
-    port = NODE_ENV ? 80 : 3000
+    port = NODE_ENV ? 9000 : 3000
 
 var app = express()
 
