@@ -14,7 +14,7 @@ let articles = {}
 
 
 
-// save img 
+// save img
 const saveImg = imgObj => {
     return new Promise((resolve, reject) => {
         fs.writeFile(
@@ -34,8 +34,8 @@ articles.get = (req, res) => {
     let
         classes = Cache.find('classes'),
         filter = req.query.filter,
-        limit = req.query.limit || 10,
-        offset = req.query.offset || 0,
+        limit = parseInt(req.query.limit || 10),
+        offset = parseInt(req.query.offset || 0),
         articleIds = [],
         _filter = {};
     const projection = [{ key: 'sort', value: { id: -1 } }, { key: 'limit', value: limit }, { key: 'skip', value: offset }];
@@ -50,10 +50,11 @@ articles.get = (req, res) => {
         })
         _filter = { id: { $in: articleIds } }
     }
-    db.find(COLLECTIONNAME, _filter, projection).then(data => {
+    db.find(COLLECTIONNAME, _filter, projection).then(({ data, totalAmount }) => {
         if (Array.isArray(data)) {
             res.send(JSON.stringify({
                 code: 0,
+                totalAmount: totalAmount,
                 articles: data.map(item => {
                     let classId = item.classes;
                     item.classes = Cache.findOne('classes', classId)
@@ -87,7 +88,7 @@ articles.get = (req, res) => {
 articles.getOne = (req, res) => {
     let id = parseInt(req.params.id),
         classes = Cache.find('classes');
-    db.find(COLLECTIONNAME, { id: id }).then(data => {
+    db.find(COLLECTIONNAME, { id: id }).then(({ data }) => {
             if (Array.isArray(data) && data.length === 1) {
                 let _data = data[0],
                     classId = _data.classes;
@@ -121,7 +122,7 @@ articles.put = (req, res) => {
         imgObj = Object.assign({}, data.article.bg)
 
     // pre-process data
-    delete data.article._id // delete existing '_id' field because mongoDB not support update '_id' field 
+    delete data.article._id // delete existing '_id' field because mongoDB not support update '_id' field
     delete data.article.timestamp // not update 'timestamp', 'date', '_index' field
     delete data.article.date
     delete data.article._index
