@@ -32,7 +32,8 @@ app.use(bodyParser.urlencoded({
     extended: true
 }))
 app.use(cookieParser('LinDong secret'))
-app.use(express.static(path.join(__dirname, 'public')))
+    // todo 准备改成nginx获取静态文件
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 60 * 60 * 24 * 30 * 1000 }))
 
 // set seeion
 // app.use(session({
@@ -60,7 +61,7 @@ if (!NODE_ENV) {
         res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
         res.header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With')
         res.header('Access-Control-Allow-Credentials', "true")
-        // if(req.method=="OPTIONS") res.send(200);/*让options请求快速返回*/
+            // if(req.method=="OPTIONS") res.send(200);/*让options请求快速返回*/
         next()
 
     })
