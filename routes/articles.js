@@ -17,6 +17,9 @@ let articles = {}
 // save img
 const saveImg = imgObj => {
     return new Promise((resolve, reject) => {
+        if (!imgObj.ctn) {
+            resolve() // 表示用默认的背景图
+        }
         fs.writeFile(
             path.resolve(__dirname, '../public/upload/articles/', imgObj.name),
             new Buffer(imgObj.ctn.replace(/^data:image\/\w+;base64,/, ''), 'base64'),
@@ -128,7 +131,9 @@ articles.put = (req, res) => {
     delete data.article._index
 
     data.article.html = marked(data.article.markdown)
-    data.article.bg.ctn = '/upload/articles/' + data.article.bg.name
+    if (data.article.bg.name) {
+        data.article.bg.ctn = '/upload/articles/' + data.article.bg.name
+    }
 
     // 修改最后编辑时间
     data.article.last_time = moment().format('YYYY-MM-DD HH:mm')
@@ -169,7 +174,10 @@ articles.post = (req, res) => {
     saveImg(data.bg).then(() => {
         // success
         // pre-process for insert article
-        data.bg.ctn = '/upload/articles/' + data.bg.name
+        if (data.bg.ctn) {
+            data.bg.ctn = '/upload/articles/' + data.bg.name
+        }
+
         data.html = marked(data.markdown)
         data.date = moment(Number(data.timestamp)).format('YYYY-MM-DD HH:mm')
 
