@@ -2,10 +2,9 @@
  * @Author: zhengxu
  * @Date: 2018-04-03 00:36:03
  * @Last Modified by: zhengxu
- * @Last Modified time: 2018-04-03 01:19:47
- * @describe 简单地直接调用这个文件修改密码
+ * @Last Modified time: 2018-04-03 23:55:47
+ * @describe 简单地直接调用这个文件修改密码，eg: npm run password -- --user xxx --password xxx
  */
-
 
 const db = require('../module/db')
 minimist = require('minimist')
